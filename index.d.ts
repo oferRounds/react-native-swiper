@@ -24,6 +24,10 @@ declare module 'react-native-swiper' {
         height?: number
         // See default style in source.
         style?: ViewStyle
+
+        containerStyle?: ViewStyle
+
+        
         // Only load current index slide , loadMinimalSize slides before and after.
         loadMinimal?: boolean
         // see loadMinimal
