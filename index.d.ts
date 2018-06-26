@@ -103,6 +103,8 @@ declare module 'react-native-swiper' {
         automaticallyAdjustContentInsets?: boolean
         // Enables/Disables swiping
         scrollEnabled?: boolean
+
+        onLayout?: (event: LayoutChangeEvent) => void
     }
 
     export default class Swiper extends Component<SwiperProps, any> {
