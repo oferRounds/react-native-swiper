@@ -1,5 +1,5 @@
 declare module 'react-native-swiper' {
-    import { ViewStyle } from 'react-native'
+    import { ViewStyle, LayoutChangeEvent } from 'react-native'
     import { Component } from 'react'
 
     interface SwiperProps {
@@ -108,5 +108,6 @@ declare module 'react-native-swiper' {
     }
 
     export default class Swiper extends Component<SwiperProps, any> {
+      scrollBy(numberOfPagesWithDirection: number, animated?: boolean): void
     }
 }
