@@ -393,36 +393,45 @@ export default class extends Component {
    */
   updateIndex = (offset, dir, cb) => {
     const state = this.state
-    let index = state.index
-    const diff = offset[dir] - this.internals.offset[dir]
-    const step = dir === 'x' ? state.width : state.height
+
+    const step = (dir === 'x') ? state.width : state.height
     let loopJump = false
+    const diff = offset[dir] - this.internals.offset[dir]
+
+    let newIndex;
+
+    if (dir === 'x') {
+      newIndex = (offset[dir] / state.width);
+    } else {
+      newIndex = (offset[dir] / state.height);
+    }
 
     // Do nothing if offset no change.
-    if (!diff) return
+    if (newIndex === state.index) {
+      return;
+    } 
 
     // Note: if touch very very quickly and continuous,
     // the variation of `index` more than 1.
     // parseInt() ensures it's always an integer
-    index = parseInt(index + Math.round(diff / step))
+    // newIndex = parseInt(newIndex + Math.round(diff / step));
 
     if (this.props.loop) {
-      if (index <= -1) {
-        index = state.total - 1
-        offset[dir] = step * state.total
-        loopJump = true
+      if (newIndex <= -1) {
+        newIndex = state.total - 1;
+        offset[dir] = step * state.total;
+        loopJump = true;
       } else if (index >= state.total) {
-        index = 0
-        offset[dir] = step
-        loopJump = true
+        newIndex = 0;
+        offset[dir] = step;
+        loopJump = true;
       }
     }
 
-    const newState = {}
-    newState.index = index
-    newState.loopJump = loopJump
+    const newState = {};
+    newState.loopJump = loopJump;
 
-    this.internals.offset = offset
+    this.internals.offset = offset;
 
     // only update offset in state if loopJump is true
     if (loopJump) {
@@ -432,17 +441,17 @@ export default class extends Component {
       // so we increment it by 1 then immediately set it to what it should be,
       // after render.
       if (offset[dir] === this.internals.offset[dir]) {
-        newState.offset = { x: 0, y: 0 }
-        newState.offset[dir] = offset[dir] + 1
+        newState.offset = { x: 0, y: 0 };
+        newState.offset[dir] = offset[dir] + 1;
         this.setState(newState, () => {
-          this.setState({ offset: offset }, cb)
+          this.setState({ offset: offset }, cb);
         })
       } else {
-        newState.offset = offset
-        this.setState(newState, cb)
+        newState.offset = offset;
+        this.setState(newState, cb);
       }
     } else {
-      this.setState(newState, cb)
+      this.setState({ loopJump: loopJump, index: newIndex }, cb);
     }
   }
 
@@ -452,14 +461,16 @@ export default class extends Component {
    * @param  {bool} animated
    */
 
-  scrollBy = (index, animated = true) => {
+  scrollBy = (targetIndex, animated = true) => {
+
     if (this.internals.isScrolling || this.state.total < 2) return
     const state = this.state
-    const diff = (this.props.loop ? 1 : 0) + index + this.state.index
+    const diff = (this.props.loop ? 1 : 0) + targetIndex
     let x = 0
     let y = 0
     if (state.dir === 'x') x = diff * state.width
     if (state.dir === 'y') y = diff * state.height
+
 
     if (Platform.OS !== 'ios') {
       this.scrollView && this.scrollView[animated ? 'setPage' : 'setPageWithoutAnimation'](diff)
